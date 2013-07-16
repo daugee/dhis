@@ -1,0 +1,194 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+</head>
+
+<body>
+<style type="text/css" media="screen">
+.blue{color:blue;text-decoration:underline;cursor:pointer;}
+#indicators{position:absolute;left:20%; cursor:pointer;}
+#reports{position:absolute;left:20%; cursor:pointer;}
+#charts{position:absolute;left:50%; cursor:pointer;}
+#maps{position:relative; margin-top:154px; left:40px;}
+
+
+/* Put your CSS styling here */
+
+</style>
+
+<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+<script type="text/javascript">
+	   var id1,id,href,idn;	
+  var data;
+  var  ChartData={};
+function printDetails(idn)
+	{
+		$("#maps").html("");
+		
+		$.get("../../../api/mapViews.json",function(map)
+		{
+			
+			$(map.mapViews).each(function(i, myData)
+			{	
+				
+				$.get("../../../api/mapViews/"+myData.id+".json",function(mapRef)
+				{
+    					
+					$(mapRef.indicator).each(function(i,mapIndicatorId)
+					{
+						
+						
+						if(idn==mapIndicatorId.id)
+						{
+							
+							var image=$("<img >").attr("Src",mapRef.href+'/data').append("<br />"); 
+							$("#maps").append(image);
+						}
+						
+					});
+				});
+			});
+		});
+	}
+function reports(idn)
+	{
+		$("#reports").html("");
+		
+		$.get("../../../api/reportTables.json",function(map)
+		{
+			
+			$(reports.reportTables).each(function(i, myData)
+			{	
+				
+				$.get("../../../api/reportTables/"+myData.id+".json",function(reportT)
+				{
+    					
+					$(reportT.indicator).each(function(i,mapIndicatorId)
+					{
+						
+						
+						if(idn==mapIndicatorId.id)
+						{
+							//var anchor = $("<a></a>").attr("href", "#").append(data.html);
+                                        
+							//var image=$("<img >").attr("Src",reportT.href+'/data').append("<br />"); 
+							$("#reports").append(data.html);
+						}
+						
+					});
+				});
+			});
+		});
+	}
+function chartLoad(idn)
+	{
+		
+		
+		$("#Charts").html("");
+	
+
+	
+      $.get('../../../api/charts/query/'+'.json', function(json) 
+	                    {
+							
+		$(json.charts).each(function(i, data){
+	              var chartid=data.id;
+				  var charthref=data.href;
+				  
+			 $.get(charthref+'.json', function(chart) {
+				 $(chart.indicators).each(function(i, dat){
+					
+					 if(dat.id==idn){
+						
+						
+					   var anchor = $("<img  >").attr("Src",charthref+'/data').append("<br />"); 
+									  
+									 
+                                        
+                                        $("#Charts").append(anchor);
+						
+					 }
+					
+				 });
+				});	  
+		
+			 });			
+		  	 
+		 
+                        });
+	}   
+
+	function printIt(id)
+	{
+		$("#indicators").html("");
+          
+	   	$.get(id+'.json',function(json)
+	   	{ 
+	   	    $(json.indicators).each(function(i, data)
+                                {
+                                	if(data.name==""){$("#indicators").html("<p style='color:red;'>no indicators</p>");}
+									  idn=data.id;
+									  //idn=data.href;
+									  
+
+				var anchor = $("<a id='"+idn+"'  onclick='javascript:chartLoad(id),printDetails(id)' ><a>").append(data.name).append("<br>");					  
+			 
+									  	 
+                                        
+                                        $("#indicators").append(anchor);
+                                });
+	   	});
+	}   
+
+        $(document).ready(function(){
+			 
+                
+                $("#search").keyup(function(){
+	
+                        $("#results").html("");
+						  
+                        $("#indicators").html("");
+                    $.get('../../../api/indicatorGroups/query/'+$(this).val()+'.json', function(json)
+                        {
+                                $(json.indicatorGroups).each(function(i, data)
+                                {
+									
+                                	id1=data.href;
+								       
+									   
+                                        var anchor = $("<p class='blue' id='"+id1+"' onclick='javascript:printIt(id)'></p>").append(data.name);
+                                        
+                                        $("#results").append(anchor);
+										
+                                        
+                                });
+                        });
+                        
+                });
+                
+                
+        });
+</script>
+
+<h1>Search</h1>
+<div style="float:left;height:auto;">
+<label for="search">Search Criteria</label>
+<input type="text" id="search" class="search" />
+<div id="results"></div>
+
+</div>
+
+<div id="indicators">
+
+</div>
+<div id="Charts">
+
+</div>
+</div>
+<div id="maps"></div>
+
+<div id="reports"></div>
+</body>
+</html>
